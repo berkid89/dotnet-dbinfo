@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2018
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotnet-dbinfo", "dotnet-dbinfo\dotnet-dbinfo.csproj", "{772F133A-EF5E-48BD-AAAF-3F7B1E4B5D0A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{772F133A-EF5E-48BD-AAAF-3F7B1E4B5D0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{772F133A-EF5E-48BD-AAAF-3F7B1E4B5D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{772F133A-EF5E-48BD-AAAF-3F7B1E4B5D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{772F133A-EF5E-48BD-AAAF-3F7B1E4B5D0A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {56F67413-77E7-42FC-AEDE-C271BA633A4E}
+	EndGlobalSection
+EndGlobal
