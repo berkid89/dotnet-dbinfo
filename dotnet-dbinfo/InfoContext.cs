@@ -24,7 +24,7 @@ namespace dotnet_dbinfo
         {
             switch (options.SupportedDatabaseType)
             {
-                case SupportedDatabaseType.SQL_SERVER:
+                case SupportedDatabaseType.SQLSERVER:
                     optionsBuilder.UseSqlServer($"data source={options.Server};initial catalog={options.Database};User Id={options.User};Password ={options.Password};");
                     break;
                 default:

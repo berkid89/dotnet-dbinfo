@@ -1,7 +1,8 @@
 {
   "profiles": {
     "dotnet-dbinfo": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "sqlserver jay-win-ci.westeurope.cloudapp.azure.com  RGTKRDatabaseTest tkr_test_svc"
     }
   }
 }

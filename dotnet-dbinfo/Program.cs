@@ -1,4 +1,5 @@
-﻿using dotnet_dbinfo.InfoCollectors;
+﻿using dotnet_dbinfo.Enums;
+using dotnet_dbinfo.InfoCollectors;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -13,20 +14,20 @@ namespace dotnet_dbinfo
 
         static void Main(string[] args)
         {
-            var options = new Options()
-            {
-                Server = args[0],
-                Database = args[1],
-                User = args[2],
-                Password = args[3],
-                ResultPath = args[4]
-            };
+            var options = new Options(args);
 
-            serviceProvider = new ServiceCollection()
+            var services = new ServiceCollection()
                 .AddSingleton(p => options)
-                .AddDbContext<InfoContext>()
-                .AddSingleton<IInfoCollector, SqlServerInfoCollector>()
-                .BuildServiceProvider();
+                .AddDbContext<InfoContext>();
+
+            switch (options.SupportedDatabaseType)
+            {
+                case SupportedDatabaseType.SQLSERVER:
+                    services.AddSingleton<IInfoCollector, SqlServerInfoCollector>();
+                    break;
+            }
+
+            serviceProvider = services.BuildServiceProvider();
 
             var infoCollector = serviceProvider.GetService<IInfoCollector>();
 

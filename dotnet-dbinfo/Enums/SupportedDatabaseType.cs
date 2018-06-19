@@ -2,6 +2,6 @@
 {
     public enum SupportedDatabaseType
     {
-        SQL_SERVER
+        SQLSERVER
     }
 }
