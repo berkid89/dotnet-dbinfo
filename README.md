@@ -21,7 +21,7 @@ dotnet tool install -g dotnet-dbinfo
 ### Microsoft SQL Server
 
 ```
-Usage: dotnet dbinfo sqlserver server database user password [resultpath]
+Usage: dotnet dbinfo sqlserver server database user password
 
 Arguments:
 
