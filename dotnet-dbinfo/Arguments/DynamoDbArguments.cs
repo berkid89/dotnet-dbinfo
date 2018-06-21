@@ -18,9 +18,7 @@ namespace dotnet_dbinfo.Arguments
         {
             RegionEndpoint = RegionEndpoint.EnumerableAllRegions.First(p => p.SystemName == args[1]);
 
-            Credentials = args.Length > 3 ? new BasicAWSCredentials("AKIAINQOC5I4J75FAOXA", "TyAwIY6UiQGGzV30LbkfRulcRrJAO5usLky21cXQ") : null;
-            //args[2];
-            //args[3];
+            Credentials = args.Length > 3 ? new BasicAWSCredentials(args[2], args[3]) : null;
 
             ResultPath = args.Length > 4 ? args[4] : null;
         }
