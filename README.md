@@ -5,7 +5,7 @@
 [main-nuget]: https://www.nuget.org/packages/dotnet-dbinfo/
 [main-nuget-badge]: https://img.shields.io/nuget/v/dotnet-dbinfo.svg?style=flat-square&label=nuget
 
-A simple command-line tool for get useful database information (in json format).
+A simple cross-platform command-line tool for get useful database information (in json format).
 
 ## Get started
 
