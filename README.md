@@ -48,9 +48,7 @@ Arguments:
 
   regionendpoint            Region
 
-  server                    (OPTIONAL) Name of the database server
-
-  database                  (OPTIONAL) Name of the database instance           
+  accesskey/secretkey       (OPTIONAL) If not set, tool uses AWS credentials profile file on your local system         
   
 ```
 
