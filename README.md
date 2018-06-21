@@ -18,12 +18,12 @@ dotnet tool install -g dotnet-dbinfo
 
 ## Usage
 
+### Microsoft SQL Server
+
 ```
-Usage: dotnet dbinfo databasetype server database user password [resultpath]
+Usage: dotnet dbinfo sqlserver server database user password [resultpath]
 
 Arguments:
-
-  databasetype              Type of the database server (now only sqlserver supported)
 
   server                    Name of the database server
 
@@ -31,10 +31,7 @@ Arguments:
 
   user                      Login name of the user
 
-  password                  Password of the user
-
-  resultpath                (OPTIONAL) Full path of the result text file              
-  
+  password                  Password of the user        
 ```
 
 Example:
@@ -42,10 +39,24 @@ Example:
 dotnet dbinfo sqlserver .\SQLEXPRESS master sa Pass1234
 ```
 
-or
+### AWS DynamoDb
 
 ```
-dotnet dbinfo sqlserver .\SQLEXPRESS master sa Pass1234 c:\temp\res.json
+Usage: dotnet dbinfo dynamodb regionendpoint [accesskey] [secretkey]
+
+Arguments:
+
+  regionendpoint            Region
+
+  server                    (OPTIONAL) Name of the database server
+
+  database                  (OPTIONAL) Name of the database instance           
+  
+```
+
+Example:
+```
+dotnet dbinfo dynamodb
 ```
 
 > **Hint:** The result path **must be exist** and the **user** must have the necessary **permissions** for the database!
