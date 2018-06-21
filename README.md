@@ -46,7 +46,7 @@ Usage: dotnet dbinfo dynamodb regionendpoint [accesskey] [secretkey]
 
 Arguments:
 
-  regionendpoint            Region
+  regionendpoint            Region (for example: us-east-1)
 
   accesskey/secretkey       (OPTIONAL) If not set, tool uses AWS credentials profile file on your local system         
   
