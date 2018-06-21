@@ -1,32 +1,54 @@
-﻿using dotnet_dbinfo.Models;
+﻿using dotnet_dbinfo.Arguments;
+using dotnet_dbinfo.InfoCollectors.Models;
+using dotnet_dbinfo.InfoCollectors.SqlServer.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace dotnet_dbinfo.InfoCollectors
+namespace dotnet_dbinfo.InfoCollectors.SqlServer
 {
-    public class SqlServerInfoCollector : IInfoCollector
+    public class SqlServerInfoCollector : InfoCollector
     {
         private readonly InfoContext db;
-        private readonly Options options;
+        private readonly SqlServerArguments args;
 
-        public SqlServerInfoCollector(InfoContext db, Options options)
+        public SqlServerInfoCollector(SqlServerArguments args)
         {
-            this.db = db;
-            this.options = options;
+            this.args = args;
+            db = new InfoContext(args);
         }
 
-        public DbInfo GetGeneralInfo()
+        public override IArguments GetArgs()
         {
-            return db.DbInfo.FromSql(@"
+            return args;
+        }
+
+        public override string Collect()
+        {
+            return serialize(new
+            {
+                general = getGeneralInfo(db.DbInfo),
+                tables = getTableInfo(db.TableInfo),
+                fragmentedIndexes = getFragmentedIndexes(db.IndexInfo)
+            });
+        }
+
+        public override void Dispose()
+        {
+            db.Dispose();
+        }
+
+        private DbInfo getGeneralInfo(DbSet<DbInfo> set)
+        {
+            return set.FromSql(@"
                                 SELECT [name] [Name], [database_id] [DatabaseId], [create_date] [CreateDate], [collation_name] [Collation], [state_desc] [State]
                                 FROM sys.databases
-                                WHERE [name] = {0}", options.Database).First();
+                                WHERE [name] = {0}", args.Database).First();
         }
 
-        public IEnumerable<IndexInfo> GetFragmentedIndexes()
+        private IEnumerable<IndexInfo> getFragmentedIndexes(DbSet<IndexInfo> set)
         {
-            return db.IndexInfo.FromSql(@"
+            return set.FromSql(@"
                                 SELECT
                                 dbindexes.[name] [Index],
                                 '[' + dbschemas.[name] + '].[' + dbtables.[name] + ']' [TableName],
@@ -36,12 +58,12 @@ namespace dotnet_dbinfo.InfoCollectors
                                     INNER JOIN sys.schemas dbschemas on dbtables.[schema_id] = dbschemas.[schema_id]
                                     INNER JOIN sys.indexes AS dbindexes ON dbindexes.[object_id] = indexstats.[object_id] AND indexstats.index_id = dbindexes.index_id
                                 WHERE indexstats.database_id = DB_ID() and indexstats.avg_fragmentation_in_percent > 5
-                                ORDER BY indexstats.avg_fragmentation_in_percent desc");
+                                ORDER BY indexstats.avg_fragmentation_in_percent desc").ToList();
         }
 
-        public IEnumerable<RowCountInfo> GetRowcounts()
+        private IEnumerable<TableInfo> getTableInfo(DbSet<TableInfo> set)
         {
-            return db.RowCountInfo.FromSql(@"
+            return set.FromSql(@"
                                 DECLARE @TableRowCounts TABLE ([TableName] VARCHAR(128), [RowCount] INT) ;
                                 INSERT INTO @TableRowCounts([TableName], [RowCount])
                                 EXEC sp_MSforeachtable 'SELECT ''?'' [TableName], COUNT(*) [RowCount] FROM ?';

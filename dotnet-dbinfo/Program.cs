@@ -1,8 +1,8 @@
-﻿using dotnet_dbinfo.Enums;
+﻿using dotnet_dbinfo.Arguments;
+using dotnet_dbinfo.Enums;
 using dotnet_dbinfo.InfoCollectors;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using dotnet_dbinfo.InfoCollectors.DynamoDb;
+using dotnet_dbinfo.InfoCollectors.SqlServer;
 using System;
 using System.IO;
 
@@ -10,44 +10,34 @@ namespace dotnet_dbinfo
 {
     class Program
     {
-        static ServiceProvider serviceProvider;
-
         static void Main(string[] args)
         {
-            var options = new Options(args);
+            IInfoCollector collector = null;
 
-            var services = new ServiceCollection()
-                .AddSingleton(p => options)
-                .AddDbContext<InfoContext>();
-
-            switch (options.SupportedDatabaseType)
+            switch (Enum.Parse<SupportedDatabaseType>(args[0], true))
             {
                 case SupportedDatabaseType.SQLSERVER:
-                    services.AddSingleton<IInfoCollector, SqlServerInfoCollector>();
+                    collector = new SqlServerInfoCollector(new SqlServerArguments(args));
+                    break;
+                case SupportedDatabaseType.DYNAMODB:
+                    collector = new DynamoDbInfoCollector(new DynamoDbArguments(args));
                     break;
             }
 
-            serviceProvider = services.BuildServiceProvider();
+            var result = collector.Collect();
 
-            var infoCollector = serviceProvider.GetService<IInfoCollector>();
+            collector.Dispose();
 
-            var general = infoCollector.GetGeneralInfo();
+            var resultPath = collector.GetArgs().ResultPath;
 
-            var rowCounts = infoCollector.GetRowcounts();
-
-            var fragmentedIndexes = infoCollector.GetFragmentedIndexes();
-
-            var result = JsonConvert.SerializeObject(new
-            {
-                general,
-                rowCounts,
-                fragmentedIndexes
-            }, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver(), Formatting = Formatting.Indented });
-
-            if (!string.IsNullOrEmpty(options.ResultPath))
-                File.WriteAllText(options.ResultPath, result);
+            if (!string.IsNullOrEmpty(resultPath))
+                File.WriteAllText(resultPath, result);
             else
                 Console.Write(result);
+
+#if DEBUG
+            Console.ReadKey();
+#endif
         }
     }
 }

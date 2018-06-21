@@ -2,6 +2,7 @@
 {
     public enum SupportedDatabaseType
     {
-        SQLSERVER
+        SQLSERVER,
+        DYNAMODB
     }
 }
