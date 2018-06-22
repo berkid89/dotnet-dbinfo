@@ -64,10 +64,10 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer
         private IEnumerable<TableInfo> getTableInfo(DbSet<TableInfo> set)
         {
             return set.FromSql(@"
-                                DECLARE @TableRowCounts TABLE ([TableName] VARCHAR(128), [ItemCount] INT) ;
-                                INSERT INTO @TableRowCounts([TableName], [RowCount])
-                                EXEC sp_MSforeachtable 'SELECT ''?'' [TableName], COUNT(*) [RowCount] FROM ?';
-                                SELECT[TableName], [RowCount]
+                                DECLARE @TableRowCounts TABLE ([TableName] VARCHAR(128), [ItemCount] BIGINT) ;
+                                INSERT INTO @TableRowCounts([TableName], [ItemCount])
+                                EXEC sp_MSforeachtable 'SELECT ''?'' [TableName], COUNT(*) [ItemCount] FROM ?';
+                                SELECT[TableName], [ItemCount]
                                 FROM @TableRowCounts
                                 ORDER BY[TableName]").ToList();
         }
