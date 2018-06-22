@@ -3,6 +3,7 @@ using dotnet_dbinfo.Arguments;
 using dotnet_dbinfo.InfoCollectors.DynamoDb.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace dotnet_dbinfo.InfoCollectors.DynamoDb
@@ -67,7 +68,14 @@ namespace dotnet_dbinfo.InfoCollectors.DynamoDb
                     ItemCount = table.ItemCount,
                     TableSizeInMb = convertBytesToMegabytes(table.TableSizeBytes),
                     CreateDate = table.CreationDateTime,
-                    Status = table.TableStatus.Value
+                    Status = table.TableStatus.Value,
+                    GlobalSecondaryIndexes = table.GlobalSecondaryIndexes.Select(p => new
+                    {
+                        p.IndexName,
+                        IndexItemCount = p.ItemCount,
+                        IndexSizeInMb = convertBytesToMegabytes(p.IndexSizeBytes),
+                        IndexStatus = p.IndexStatus.Value
+                    })
                 });
             }
 
