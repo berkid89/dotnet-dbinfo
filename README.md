@@ -57,5 +57,5 @@ Example:
 dotnet dbinfo dynamodb us-east-1
 ```
 
-> **Hint:** The result path **must be exist** and the **user** must have the necessary **permissions** for the database!
+> **Hint:** The **user** must have the necessary **permissions** for the database!
 
