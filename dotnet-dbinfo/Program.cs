@@ -10,34 +10,55 @@ namespace dotnet_dbinfo
 {
     class Program
     {
-        static void Main(string[] args)
+        private const int ERROR = 2;
+        private const int OK = 0;
+
+        static int Main(string[] args)
         {
-            IInfoCollector collector = null;
-
-            switch (Enum.Parse<SupportedDatabaseType>(args[0], true))
+            try
             {
-                case SupportedDatabaseType.SQLSERVER:
-                    collector = new SqlServerInfoCollector(new SqlServerArguments(args));
-                    break;
-                case SupportedDatabaseType.DYNAMODB:
-                    collector = new DynamoDbInfoCollector(new DynamoDbArguments(args));
-                    break;
-            }
 
-            var result = collector.Collect();
+                IInfoCollector collector = null;
 
-            collector.Dispose();
+                switch (Enum.Parse<SupportedDatabaseType>(args[0], true))
+                {
+                    case SupportedDatabaseType.SQLSERVER:
+                        collector = new SqlServerInfoCollector(new SqlServerArguments(args));
+                        break;
+                    case SupportedDatabaseType.DYNAMODB:
+                        collector = new DynamoDbInfoCollector(new DynamoDbArguments(args));
+                        break;
+                }
 
-            var resultPath = collector.GetArgs().ResultPath;
+                var result = collector.Collect();
 
-            if (!string.IsNullOrEmpty(resultPath))
-                File.WriteAllText(resultPath, result);
-            else
-                Console.Write(result);
+                collector.Dispose();
+
+                var resultPath = collector.GetArgs().ResultPath;
+
+                if (!string.IsNullOrEmpty(resultPath))
+                    File.WriteAllText(resultPath, result);
+                else
+                    Console.Write(result);
 
 #if DEBUG
-            Console.ReadKey();
+                Console.ReadKey();
 #endif
+
+                return OK;
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Error.WriteLine("Unexpected error: " + ex.ToString());
+                Console.ResetColor();
+
+#if DEBUG
+                Console.ReadKey();
+#endif
+
+                return ERROR;
+            }
         }
     }
 }

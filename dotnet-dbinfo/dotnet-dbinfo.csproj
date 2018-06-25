@@ -8,7 +8,7 @@
     <Authors>berkid89</Authors>
     <Company />
     <Product />
-    <Version>1.1.4</Version>
+    <Version>1.1.5</Version>
     <Description>A simple command-line tool for get useful database information (in json format). Source: https://github.com/berkid89/dotnet-dbinfo</Description>
   </PropertyGroup>
 
