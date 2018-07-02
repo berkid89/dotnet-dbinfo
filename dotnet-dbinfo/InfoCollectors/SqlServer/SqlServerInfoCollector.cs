@@ -50,7 +50,9 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer
         {
             return set.FromSql(@"
                                 SELECT
+                                dbindexes.[object_id] [ObjectId],
                                 dbindexes.[name] [Index],
+								dbindexes.[type_desc] [Type],
                                 '[' + dbschemas.[name] + '].[' + dbtables.[name] + ']' [TableName],
                                 indexstats.[avg_fragmentation_in_percent] as [AvgFragmentationInPercent]
                                     FROM sys.dm_db_index_physical_stats (DB_ID(), NULL, NULL, NULL, NULL) AS indexstats

@@ -7,12 +7,18 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer.Models
     {
         [Key]
         [JsonProperty(Order = 0)]
-        public string Index { get; set; }
+        public int ObjectId { get; set; }
 
         [JsonProperty(Order = 1)]
-        public string TableName { get; set; }
+        public string Type { get; set; }
 
         [JsonProperty(Order = 2)]
+        public string Index { get; set; }
+
+        [JsonProperty(Order = 3)]
+        public string TableName { get; set; }
+
+        [JsonProperty(Order = 4)]
         public double AvgFragmentationInPercent { get; set; }
     }
 }
