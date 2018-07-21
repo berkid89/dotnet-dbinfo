@@ -1,21 +1,19 @@
 ﻿using dotnet_dbinfo.Arguments;
-using dotnet_dbinfo.InfoCollectors.Models;
-using dotnet_dbinfo.InfoCollectors.SqlServer.Models;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
+using System.Data.SqlClient;
 
 namespace dotnet_dbinfo.InfoCollectors.SqlServer
 {
     public class SqlServerInfoCollector : InfoCollector
     {
-        private readonly InfoContext db;
+        private readonly SqlConnection conn;
         private readonly SqlServerArguments args;
 
         public SqlServerInfoCollector(SqlServerArguments args)
         {
             this.args = args;
-            db = new InfoContext(args);
+            conn = new SqlConnection($"data source={args.Server};initial catalog={args.Database};User Id={args.User};Password ={args.Password};");
+            conn.Open();
         }
 
         public override IArguments GetArgs()
@@ -27,28 +25,47 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer
         {
             return serialize(new
             {
-                general = getGeneralInfo(db.DbInfo),
-                tables = getTableInfo(db.TableInfo),
-                fragmentedIndexes = getFragmentedIndexes(db.IndexInfo)
+                general = getGeneralInfo(),
+                tables = getTableInfo(),
+                fragmentedIndexes = getFragmentedIndexes()
             });
         }
 
         public override void Dispose()
         {
-            db.Dispose();
+            conn.Dispose();
         }
 
-        private DbInfo getGeneralInfo(DbSet<DbInfo> set)
+        private object getGeneralInfo()
         {
-            return set.FromSql(@"
-                                SELECT [name] [Name], [database_id] [DatabaseId], [create_date] [CreateDate], [collation_name] [Collation], [state_desc] [State]
+            var command = new SqlCommand($@"
+                                SELECT [database_id] [DatabaseId], [name] [Name], [create_date] [CreateDate], [collation_name] [Collation], [state_desc] [State]
                                 FROM sys.databases
-                                WHERE [name] = {0}", args.Database).First();
+                                WHERE [name] = '{args.Database}'", conn);
+
+            using (var reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    return new
+                    {
+                        DatabaseId = reader[0],
+                        Name = reader[1],
+                        CreateDate = reader[2],
+                        Collation = reader[3],
+                        State = reader[4]
+                    };
+                }
+            }
+
+            return new { };
         }
 
-        private IEnumerable<IndexInfo> getFragmentedIndexes(DbSet<IndexInfo> set)
+        private IEnumerable<object> getFragmentedIndexes()
         {
-            return set.FromSql(@"
+            var result = new List<object>();
+
+            var command = new SqlCommand(@"
                                 SELECT
                                 dbindexes.[object_id] [ObjectId],
                                 dbindexes.[name] [Index],
@@ -60,18 +77,51 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer
                                     INNER JOIN sys.schemas dbschemas on dbtables.[schema_id] = dbschemas.[schema_id]
                                     INNER JOIN sys.indexes AS dbindexes ON dbindexes.[object_id] = indexstats.[object_id] AND indexstats.index_id = dbindexes.index_id
                                 WHERE indexstats.database_id = DB_ID() and indexstats.avg_fragmentation_in_percent > 5
-                                ORDER BY indexstats.avg_fragmentation_in_percent desc").ToList();
+                                ORDER BY indexstats.avg_fragmentation_in_percent desc", conn);
+
+            using (var reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    result.Add(new
+                    {
+                        ObjectId = reader[0],
+                        Index = reader[1],
+                        Type = reader[2],
+                        TableName = reader[3],
+                        AvgFragmentationInPercent = reader[4]
+                    });
+                }
+            }
+
+            return result;
         }
 
-        private IEnumerable<TableInfo> getTableInfo(DbSet<TableInfo> set)
+        private IEnumerable<object> getTableInfo()
         {
-            return set.FromSql(@"
+            var result = new List<object>();
+
+            var command = new SqlCommand(@"
                                 DECLARE @TableRowCounts TABLE ([TableName] VARCHAR(128), [ItemCount] BIGINT) ;
                                 INSERT INTO @TableRowCounts([TableName], [ItemCount])
                                 EXEC sp_MSforeachtable 'SELECT ''?'' [TableName], COUNT(*) [ItemCount] FROM ?';
-                                SELECT[TableName], [ItemCount]
+                                SELECT [TableName], [ItemCount]
                                 FROM @TableRowCounts
-                                ORDER BY[TableName]").ToList();
+                                ORDER BY[TableName]", conn);
+
+            using (var reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    result.Add(new
+                    {
+                        TableName = reader[0],
+                        ItemCount = reader[1],
+                    });
+                }
+            }
+
+            return result;
         }
     }
 }

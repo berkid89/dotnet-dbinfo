@@ -1,10 +1,7 @@
 ﻿using Amazon.DynamoDBv2;
 using dotnet_dbinfo.Arguments;
-using dotnet_dbinfo.InfoCollectors.DynamoDb.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace dotnet_dbinfo.InfoCollectors.DynamoDb
 {
@@ -44,28 +41,28 @@ namespace dotnet_dbinfo.InfoCollectors.DynamoDb
             db.Dispose();
         }
 
-        private DbInfo getGeneralInfo()
+        private object getGeneralInfo()
         {
-            return new DbInfo()
+            return new
             {
                 ServiceName = db.Config.RegionEndpointServiceName,
                 Region = $"{args.RegionEndpoint.DisplayName} ({args.RegionEndpoint.SystemName})",
-                ServiceVersion = db.Config.ServiceVersion
+                db.Config.ServiceVersion
             };
         }
 
-        private IEnumerable<DynamoDbTableInfo> getTableInfo()
+        private IEnumerable<object> getTableInfo()
         {
-            var result = new List<DynamoDbTableInfo>();
+            var result = new List<object>();
 
             foreach (var tableName in db.ListTablesAsync().Result.TableNames)
             {
                 var table = db.DescribeTableAsync(tableName).Result.Table;
 
-                result.Add(new DynamoDbTableInfo()
+                result.Add(new
                 {
-                    TableName = table.TableName,
-                    ItemCount = table.ItemCount,
+                    table.TableName,
+                    table.ItemCount,
                     TableSizeInMb = convertBytesToMegabytes(table.TableSizeBytes),
                     CreateDate = table.CreationDateTime,
                     Status = table.TableStatus.Value,
