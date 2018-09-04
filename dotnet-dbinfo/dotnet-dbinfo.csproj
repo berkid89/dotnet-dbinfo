@@ -13,7 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.10.3" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.13.1" />
+    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="1.9.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />

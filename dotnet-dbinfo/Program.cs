@@ -1,14 +1,14 @@
-﻿using dotnet_dbinfo.Arguments;
-using dotnet_dbinfo.Enums;
-using dotnet_dbinfo.InfoCollectors;
-using dotnet_dbinfo.InfoCollectors.DynamoDb;
+﻿using dotnet_dbinfo.InfoCollectors;
 using dotnet_dbinfo.InfoCollectors.SqlServer;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
-using System.IO;
+using System.Linq;
+using static dotnet_dbinfo.ConnectionHelpers;
 
 namespace dotnet_dbinfo
 {
-    class Program
+    static class Program
     {
         private const int ERROR = 2;
         private const int OK = 0;
@@ -17,30 +17,19 @@ namespace dotnet_dbinfo
         {
             try
             {
-
-                IInfoCollector collector = null;
-
-                switch (Enum.Parse<SupportedDatabaseType>(args[0], true))
+                switch (GetDbType(GetArg(args, 0)))
                 {
                     case SupportedDatabaseType.SQLSERVER:
-                        collector = new SqlServerInfoCollector(new SqlServerArguments(args));
+                        Console.Write(Serialize(ConnectToSqlServer($"data source={GetArg(args, 1)};initial catalog={GetArg(args, 2)};User Id={GetArg(args, 3)};Password ={GetArg(args, 4)};",
+                            SqlServerInfoCollector.CollectSqlServerDbInfo)));
                         break;
                     case SupportedDatabaseType.DYNAMODB:
-                        collector = new DynamoDbInfoCollector(new DynamoDbArguments(args));
+                        Console.Write(Serialize(ConnectToDynamoDb(GetArg(args, 2), GetArg(args, 3), GetArg(args, 1), DynamoDbInfoCollector.CollectDynamoDbInfo)));
+                        break;
+                    case SupportedDatabaseType.COSMOSDB:
+                        Console.Write(Serialize(ConnectToCosmosDb(GetArg(args, 1), GetArg(args, 2), GetArg(args, 3), CosmosDbInfoCollector.CollectCosmosDbInfo)));
                         break;
                 }
-
-                var result = collector.Collect();
-
-                collector.Dispose();
-
-                var resultPath = collector.GetArgs().ResultPath;
-
-                if (!string.IsNullOrEmpty(resultPath))
-                    File.WriteAllText(resultPath, result);
-                else
-                    Console.Write(result);
-
 #if DEBUG
                 Console.ReadKey();
 #endif
@@ -59,6 +48,26 @@ namespace dotnet_dbinfo
 
                 return ERROR;
             }
+        }
+
+        static SupportedDatabaseType GetDbType(string type) =>
+            Enum.Parse<SupportedDatabaseType>(type, true);
+
+        static string Serialize(object obj)
+        {
+            return JsonConvert.SerializeObject(obj, new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                Formatting = Formatting.Indented
+            });
+        }
+
+        static string GetArg(string[] args, int index)
+        {
+            if (args.Count() > index)
+                return args[index];
+            else
+                return null;
         }
     }
 }

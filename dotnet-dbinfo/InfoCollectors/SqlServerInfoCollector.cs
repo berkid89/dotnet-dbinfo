@@ -1,47 +1,26 @@
-﻿using dotnet_dbinfo.Arguments;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 
 namespace dotnet_dbinfo.InfoCollectors.SqlServer
 {
-    public class SqlServerInfoCollector : InfoCollector
+    public static class SqlServerInfoCollector
     {
-        private readonly SqlConnection conn;
-        private readonly SqlServerArguments args;
-
-        public SqlServerInfoCollector(SqlServerArguments args)
+        public static object CollectSqlServerDbInfo(SqlConnection conn)
         {
-            this.args = args;
-            conn = new SqlConnection($"data source={args.Server};initial catalog={args.Database};User Id={args.User};Password ={args.Password};");
-            conn.Open();
-        }
-
-        public override IArguments GetArgs()
-        {
-            return args;
-        }
-
-        public override string Collect()
-        {
-            return serialize(new
+            return new
             {
-                general = getGeneralInfo(),
-                tables = getTableInfo(),
-                fragmentedIndexes = getFragmentedIndexes()
-            });
+                general = GetGeneralInfo(conn),
+                tables = GetTableInfo(conn),
+                fragmentedIndexes = GetFragmentedIndexes(conn)
+            };
         }
 
-        public override void Dispose()
-        {
-            conn.Dispose();
-        }
-
-        private object getGeneralInfo()
+        private static object GetGeneralInfo(SqlConnection conn)
         {
             var command = new SqlCommand($@"
                                 SELECT [database_id] [DatabaseId], [name] [Name], [create_date] [CreateDate], [collation_name] [Collation], [state_desc] [State]
                                 FROM sys.databases
-                                WHERE [name] = '{args.Database}'", conn);
+                                WHERE [name] = '{conn.Database}'", conn);
 
             using (var reader = command.ExecuteReader())
             {
@@ -61,7 +40,7 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer
             return new { };
         }
 
-        private IEnumerable<object> getFragmentedIndexes()
+        private static IEnumerable<object> GetFragmentedIndexes(SqlConnection conn)
         {
             var result = new List<object>();
 
@@ -97,7 +76,7 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer
             return result;
         }
 
-        private IEnumerable<object> getTableInfo()
+        private static IEnumerable<object> GetTableInfo(SqlConnection conn)
         {
             var result = new List<object>();
 

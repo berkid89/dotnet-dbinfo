@@ -1,8 +1,9 @@
-﻿namespace dotnet_dbinfo.Enums
+﻿namespace dotnet_dbinfo
 {
     public enum SupportedDatabaseType
     {
         SQLSERVER,
-        DYNAMODB
+        DYNAMODB,
+        COSMOSDB
     }
 }
