@@ -57,5 +57,25 @@ Example:
 dotnet dbinfo dynamodb us-east-1
 ```
 
+### Azure CosmosDb
+
+```
+Usage: dotnet dbinfo cosmosdb endpointUri primaryKey database
+
+Arguments:
+
+  endpointUri            Your endpoint URL from the Portal
+
+  primaryKey             Your primary key   
+
+  database               Name of the database    
+  
+```
+
+Example:
+```
+dotnet dbinfo dynamodb us-east-1
+```
+
 > **Hint:** The **user** must have the necessary **permissions** for the database!
 
