@@ -79,7 +79,7 @@ Arguments:
 
 Example:
 ```
-dotnet dbinfo dynamodb us-east-1
+dotnet dbinfo cosmosdb https://test.documents.azure.com:443/ Y7Tr6jZy10Jh6FOo4hCP4LR128ekLOczs4a5fQlEjH0TehgWfOdilWp2GvyQ1pmDxP3zQFXF11CclKgsg9vMz4Q== ToDoList
 ```
 
 > **Hint:** The **user** must have the necessary **permissions** for the database!
