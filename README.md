@@ -16,6 +16,11 @@ Once installed, run this command:
 dotnet tool install -g dotnet-dbinfo
 ```
 
+Update to the latest version:
+```
+dotnet tool update -g dotnet-dbinfo
+```
+
 ## Usage
 
 ### Microsoft SQL Server
