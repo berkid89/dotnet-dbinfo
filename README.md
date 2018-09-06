@@ -77,5 +77,27 @@ Example:
 dotnet dbinfo dynamodb us-east-1
 ```
 
+### MongoDb
+
+```
+Usage: dotnet dbinfo mongodb host:port database user password
+
+Arguments:
+
+  host:port             Host and port of the MongoDb server
+
+  database              Name of the database 
+
+  user                  Login name of the user
+
+  password              Password of the user   
+  
+```
+
+Example:
+```
+dotnet dbinfo mongodb localhost:27017 my_database my_user password123
+```
+
 > **Hint:** The **user** must have the necessary **permissions** for the database!
 

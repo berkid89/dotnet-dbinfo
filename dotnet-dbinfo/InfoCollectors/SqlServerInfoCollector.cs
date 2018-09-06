@@ -5,15 +5,14 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer
 {
     public static class SqlServerInfoCollector
     {
-        public static object CollectSqlServerDbInfo(SqlConnection conn)
-        {
-            return new
+        public static object CollectSqlServerDbInfo(SqlConnection conn) =>
+            new
             {
                 general = GetGeneralInfo(conn),
                 tables = GetTableInfo(conn),
                 fragmentedIndexes = GetFragmentedIndexes(conn)
             };
-        }
+
 
         private static object GetGeneralInfo(SqlConnection conn)
         {

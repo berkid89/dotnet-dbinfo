@@ -1,13 +1,14 @@
 ﻿using Amazon;
 using Amazon.DynamoDBv2;
 using Microsoft.Azure.Documents.Client;
+using MongoDB.Driver;
 using System;
 using System.Data.SqlClient;
 using System.Linq;
 
 namespace dotnet_dbinfo
 {
-    public static class ConnectionHelpers
+    public static class Helpers
     {
         public static R ConnectToSqlServer<R>(string connStr, Func<SqlConnection, R> f) => Using(new SqlConnection(connStr), conn => { conn.Open(); return f(conn); });
 
@@ -16,6 +17,8 @@ namespace dotnet_dbinfo
         , conn => { return f(conn); });
 
         public static R ConnectToCosmosDb<R>(string endpointUri, string primaryKey, string database, Func<DocumentClient, string, R> f) => Using(new DocumentClient(new Uri(endpointUri), primaryKey), conn => { return f(conn, database); });
+
+        public static R ConnectToMongoDb<R>(string connStr, string database, Func<MongoClient, string, R> f) => f(new MongoClient(connStr), database);
 
         static AmazonDynamoDBClient GetDynamoDbClient(string awsAccessKeyId, string awsSecretAccessKey, string regionEndpoint)
         {
@@ -31,5 +34,7 @@ namespace dotnet_dbinfo
         {
             using (var disp = client) return func(disp);
         }
+
+        public static double ConvertBytesToMegabytes(long bytes) => (bytes / 1024f) / 1024f;
     }
 }

@@ -8,14 +8,12 @@ namespace dotnet_dbinfo.InfoCollectors
 {
     public static class CosmosDbInfoCollector
     {
-        public static object CollectCosmosDbInfo(DocumentClient conn, string database)
-        {
-            return new
+        public static object CollectCosmosDbInfo(DocumentClient conn, string database) =>
+            new
             {
                 general = GetGeneralInfo(conn, database),
-                tables = GetTableInfo(conn, UriFactory.CreateDatabaseUri(database)),
+                collections = GetCollectionInfo(conn, UriFactory.CreateDatabaseUri(database)),
             };
-        }
 
         private static object GetGeneralInfo(DocumentClient conn, string database)
         {
@@ -28,9 +26,8 @@ namespace dotnet_dbinfo.InfoCollectors
             };
         }
 
-        private static IEnumerable<object> GetTableInfo(DocumentClient conn, Uri databaseUri)
-        {
-            return conn.CreateDocumentCollectionQuery(databaseUri).ToList().Select(p => new
+        private static IEnumerable<object> GetCollectionInfo(DocumentClient conn, Uri databaseUri) =>
+            conn.CreateDocumentCollectionQuery(databaseUri).ToList().Select(p => new
             {
                 p.Id,
                 p.AltLink,
@@ -38,7 +35,6 @@ namespace dotnet_dbinfo.InfoCollectors
                 StoredProcedures = conn.CreateStoredProcedureQuery(p.SelfLink).ToList().Select(sp => sp.Id),
                 UserDefinedFunctions = conn.CreateUserDefinedFunctionQuery(p.SelfLink).ToList().Select(uf => uf.Id),
                 Triggers = conn.CreateTriggerQuery(p.SelfLink).ToList().Select(t => t.Id)
-        }).ToList();
+            }).ToList();
     }
-}
 }

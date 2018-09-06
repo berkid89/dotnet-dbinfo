@@ -4,6 +4,7 @@
     {
         SQLSERVER,
         DYNAMODB,
-        COSMOSDB
+        COSMOSDB,
+        MONGODB
     }
 }
