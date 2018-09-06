@@ -16,6 +16,11 @@ Once installed, run this command:
 dotnet tool install -g dotnet-dbinfo
 ```
 
+Or update to the latest version:
+```
+dotnet tool update -g dotnet-dbinfo
+```
+
 ## Usage
 
 ### Microsoft SQL Server
@@ -74,7 +79,7 @@ Arguments:
 
 Example:
 ```
-dotnet dbinfo dynamodb us-east-1
+dotnet dbinfo cosmosdb https://test.documents.azure.com:443/ Y7Tr6jZy10Jh6FOo4hCP4LR128ekLOczs4a5fQlEjH0TehgWfOdilWp2GvyQ1pmDxP3zQFXF11CclKgsg9vMz4Q== ToDoList
 ```
 
 ### MongoDb
