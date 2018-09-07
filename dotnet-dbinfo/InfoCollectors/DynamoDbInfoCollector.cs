@@ -23,7 +23,7 @@ namespace dotnet_dbinfo.InfoCollectors
             };
 
         private static IEnumerable<object> GetTableInfo(AmazonDynamoDBClient conn) =>
-            conn.ListTablesAsync().Result.TableNames.Select(p => conn.DescribeTableAsync(p).Result.Table).Select(table =>
+            conn.ListTablesAsync().Result.TableNames.Select(p => conn.DescribeTableAsync(p).Result.Table).ToList().Select(table =>
             {
                 return new
                 {
@@ -40,6 +40,6 @@ namespace dotnet_dbinfo.InfoCollectors
                         IndexStatus = p.IndexStatus.Value
                     })
                 };
-            });
+            }).ToList();
     }
 }
