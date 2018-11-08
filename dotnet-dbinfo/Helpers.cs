@@ -10,7 +10,7 @@ namespace dotnet_dbinfo
 {
     public static class Helpers
     {
-        public static R ConnectToSqlServer<R>(string connStr, Func<SqlConnection, R> f) => Using(new SqlConnection(connStr), conn => { conn.Open(); return f(conn); });
+        public static R ConnectToSqlServer<R>(string connStr, bool isSQLAzure, Func<SqlConnection, bool, R> f) => Using(new SqlConnection(connStr), conn => { conn.Open(); return f(conn, isSQLAzure); });
 
         public static R ConnectToDynamoDb<R>(string awsAccessKeyId, string awsSecretAccessKey, string regionEndpoint, Func<AmazonDynamoDBClient, R> f) => Using(
             GetDynamoDbClient(awsAccessKeyId, awsSecretAccessKey, regionEndpoint)

@@ -5,11 +5,11 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer
 {
     public static class SqlServerInfoCollector
     {
-        public static object CollectSqlServerDbInfo(SqlConnection conn) =>
+        public static object CollectSqlServerDbInfo(SqlConnection conn, bool isAzureSQL) =>
             new
             {
                 general = GetGeneralInfo(conn),
-                tables = GetTableInfo(conn),
+                tables = GetTableInfo(conn, isAzureSQL),
                 fragmentedIndexes = GetFragmentedIndexes(conn)
             };
 
@@ -75,18 +75,32 @@ namespace dotnet_dbinfo.InfoCollectors.SqlServer
             return result;
         }
 
-        private static IEnumerable<object> GetTableInfo(SqlConnection conn)
+        private static IEnumerable<object> GetTableInfo(SqlConnection conn, bool isAzureSQL)
         {
             var result = new List<object>();
+            var sql = "";
+            if (isAzureSQL)
+            {
+                sql = @"DECLARE @TableRowCounts TABLE ([TableName] VARCHAR(128), [ItemCount] BIGINT) ;
+                        INSERT INTO @TableRowCounts([TableName], [ItemCount])
+                        SELECT t.name ,s.row_count 
+                        FROM sys.tables t
+                        JOIN sys.dm_db_partition_stats s ON t.object_id = s.object_id
+                        SELECT [TableName], [ItemCount]
+                        FROM @TableRowCounts
+                        ORDER BY[TableName]";
+            }
+            else
+            {
+                sql = @"DECLARE @TableRowCounts TABLE ([TableName] VARCHAR(128), [ItemCount] BIGINT) ;
+                        INSERT INTO @TableRowCounts([TableName], [ItemCount])
+                        EXEC sp_MSforeachtable 'SELECT ''?'' [TableName], COUNT(*) [ItemCount] FROM ?';
+                        SELECT [TableName], [ItemCount]
+                        FROM @TableRowCounts
+                        ORDER BY[TableName]";
+            }
 
-            var command = new SqlCommand(@"
-                                DECLARE @TableRowCounts TABLE ([TableName] VARCHAR(128), [ItemCount] BIGINT) ;
-                                INSERT INTO @TableRowCounts([TableName], [ItemCount])
-                                EXEC sp_MSforeachtable 'SELECT ''?'' [TableName], COUNT(*) [ItemCount] FROM ?';
-                                SELECT [TableName], [ItemCount]
-                                FROM @TableRowCounts
-                                ORDER BY[TableName]", conn);
-
+            var command = new SqlCommand(sql, conn);
             using (var reader = command.ExecuteReader())
             {
                 while (reader.Read())
