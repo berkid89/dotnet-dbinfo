@@ -23,7 +23,7 @@ namespace dotnet_dbinfo
                     case SupportedDatabaseType.SQLSERVER:
                         Console.Write(
                             Serialize(
-                                ConnectToSqlServer($"data source={GetArg(args, 1)};initial catalog={GetArg(args, 2)};User Id={GetArg(args, 3)};Password ={GetArg(args, 4)};", SqlServerInfoCollector.CollectSqlServerDbInfo)
+                                ConnectToSqlServer($"data source={GetArg(args, 1)};initial catalog={GetArg(args, 2)};User Id={GetArg(args, 3)};Password ={GetArg(args, 4)};", false, SqlServerInfoCollector.CollectSqlServerDbInfo)
                                 ));
                         break;
                     case SupportedDatabaseType.DYNAMODB:
@@ -42,6 +42,12 @@ namespace dotnet_dbinfo
                         Console.WriteLine(
                             Serialize(
                                 ConnectToMongoDb($"mongodb://{GetArg(args, 3)}:{GetArg(args, 4)}@{GetArg(args, 1)}/{GetArg(args, 2)}", GetArg(args, 2), MongoDbInfoCollector.CollectMongoDbInfo)
+                                ));
+                        break;
+                    case SupportedDatabaseType.SQLAZURE:
+                        Console.Write(
+                            Serialize(
+                                ConnectToSqlServer($"data source={GetArg(args, 1)};initial catalog={GetArg(args, 2)};User Id={GetArg(args, 3)};Password ={GetArg(args, 4)};", true, SqlServerInfoCollector.CollectSqlServerDbInfo)
                                 ));
                         break;
                 }

@@ -5,6 +5,7 @@
         SQLSERVER,
         DYNAMODB,
         COSMOSDB,
-        MONGODB
+        MONGODB,
+        SQLAZURE
     }
 }
